@@ -1,51 +1,66 @@
-from playwright.sync_api import sync_playwright
+def get_text(card, selector):
 
-def scrape_cards(cards):
+    locator = card.locator(selector)
+
+    if locator.count() > 0:
+
+        texto = locator.text_content()
+
+        return texto.strip() if texto else "N/A"
+
+    return "N/A"
+
+
+def scrape_cards(cards, dataFrame):
 
     for i in range(cards.count()):
 
         card = cards.nth(i)
 
-        descricao = card.locator(
+        descricao = get_text(
+            card,
             '[data-cy="rp-cardProperty-location-txt"]'
-        ).text_content()
+        )
 
-        descricao = descricao.strip() if descricao else "N/A" #Remoção de espaços em branco e tratamento de valores nulos
-
-        preco = card.locator(
+        preco = get_text(
+            card,
             '[data-cy="rp-cardProperty-price-txt"]'
-        ).text_content()
+        )
 
-        preco = preco.strip() if preco else "N/A" #Remoção de espaços em branco e tratamento de valores nulos
-
-        area = card.locator(
+        area = get_text(
+            card,
             '[data-cy="rp-cardProperty-propertyArea-txt"]'
-        ).text_content()
+        )
 
-        area = area.strip() if area else "N/A" #Remoção de espaços em branco e tratamento de valores nulos
-
-        quartos = card.locator(
+        quartos = get_text(
+            card,
             '[data-cy="rp-cardProperty-bedroomQuantity-txt"]'
-        ).text_content()
+        )
 
-        quartos = quartos.strip() if quartos else "N/A" #Remoção de espaços em branco e tratamento de valores nulos
-
-        banheiros = card.locator(
+        banheiros = get_text(
+            card,
             '[data-cy="rp-cardProperty-bathroomQuantity-txt"]'
-        ).text_content()
+        )
 
-        banheiros = banheiros.strip() if banheiros else "N/A" #Remoção de espaços em branco e tratamento de valores nulos
-
-        vagas = card.locator(
+        vagas = get_text(
+            card,
             '[data-cy="rp-cardProperty-parkingSpacesQuantity-txt"]'
-        ).text_content()
+        )
 
-        vagas = vagas.strip() if vagas else "N/A" #Remoção de espaços em branco e tratamento de valores nulos
+        dataFrame["descricao"].append(descricao)
+        dataFrame["preco"].append(preco)
+        dataFrame["area"].append(area)
+        dataFrame["quartos"].append(quartos)
+        dataFrame["banheiros"].append(banheiros)
+        dataFrame["vagas"].append(vagas)
 
-        print(f"Índice {i}") #Exibição do índice para referência (início em 0)
+        print(f"Índice {i}")
         print(descricao)
         print(preco)
         print(area)
         print(quartos)
         print(banheiros)
         print(vagas)
+        print("-" * 50)
+
+    return dataFrame
