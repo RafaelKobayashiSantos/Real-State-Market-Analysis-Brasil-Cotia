@@ -34,7 +34,7 @@ def clean_data(dataFrame):
         .str.extract(r"(\d+)")
     )
     # Limpeza e formatação dos dados, incluindo remoção de símbolos, extração de números e tratamento de valores nulos
-    
+
     df.head() #Exibição dos primeiros registros para verificação
     return df
 

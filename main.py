@@ -21,9 +21,7 @@ with sync_playwright() as p:
     page = context.new_page()
 
     url = (
-        "https://www.zapimoveis.com.br/aluguel/casas/sp+barueri/"
-        "?onde=%2CSão+Paulo%2CBarueri%2C%2C%2C%2C%2Ccity%2CBR>Sao+Paulo>NULL>Barueri%2C-23.503504%2C-46.878556%2C"
-        "&tipos=casa_residencial"
+        "https://www.zapimoveis.com.br/aluguel/casas/sp+cotia/?onde=%2CSão+Paulo%2CCotia%2C%2C%2C%2C%2Ccity%2CBR>Sao+Paulo>NULL>Cotia%2C-23.602694%2C-46.919476%2C&tipos=casa_residencial"
     )
 
     page.goto(
@@ -34,7 +32,7 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(5000)
 
-    for pagina in range(1, 4):
+    for pagina in range(1, 11):
 
         print(f"\n===== PÁGINA {pagina} =====")
 
