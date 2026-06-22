@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright
 from scrapper import scrape_cards
 from pipeline import clean_data
+from data_engineering import process_data
 
 dataFrame = { "descricao": [], "preco": [], "area": [], "quartos": [], "banheiros": [], "vagas": [] }
 
@@ -74,7 +75,8 @@ with sync_playwright() as p:
 
         page.wait_for_timeout(5000)
 
-    dados = clean_data(dataFrame) 
-    dados.to_csv( "dados_imoveis.csv", index=False, encoding="utf-8-sig" )
+    data = clean_data(dataFrame)
+    process_data(data)
+    #dados.to_csv( "dados_imoveis.csv", index=False, encoding="utf-8-sig" )
 
     browser.close()

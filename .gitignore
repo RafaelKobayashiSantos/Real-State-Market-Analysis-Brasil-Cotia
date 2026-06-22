@@ -5,8 +5,14 @@ venv/
 
 data/raw/*
 data/processed/*
+bases/*
+PBI.Report/*
+PBI.SemanticModel/*
+
 
 *.csv
+*.ipynb_checkpoints
+*.ipynb
 
 .idea/
 .vscode/
