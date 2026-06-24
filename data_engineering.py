@@ -12,6 +12,9 @@ def process_data(data):
     df["banheiros"] = pd.to_numeric(df["banheiros"], errors="coerce")
     df["vagas"] = pd.to_numeric(df["vagas"], errors="coerce")
 
+    df["preco"] = df["preco"].fillna(0)
+    df = df[df["preco"] <= 10000]
+
     # Criação de nova coluna preço por metro quadrado
     df["preco_m2"] = np.where(
         df["area"] > 0,
@@ -36,4 +39,4 @@ def process_data(data):
     )
     
 
-    df.to_excel( "dados_imoveis_pby1.xlsx", index=False )
+    df.to_excel( "dados_imoveis_pby.xlsx", index=False )

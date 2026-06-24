@@ -22,7 +22,7 @@ with sync_playwright() as p:
     page = context.new_page()
 
     url = (
-        "https://www.zapimoveis.com.br/aluguel/casas/sp+cotia/?onde=%2CSão+Paulo%2CCotia%2C%2C%2C%2C%2Ccity%2CBR>Sao+Paulo>NULL>Cotia%2C-23.602694%2C-46.919476%2C&tipos=casa_residencial"
+        "https://www.zapimoveis.com.br/aluguel/casas/sp+cotia/?onde=%2CSão+Paulo%2CCotia%2C%2C%2C%2C%2Ccity%2CBR>Sao+Paulo>NULL>Cotia%2C-23.602694%2C-46.919476%2C&tipos=casa_residencial%2Capartamento_residencial&areaMaxima=100"
     )
 
     page.goto(
@@ -33,7 +33,7 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(5000)
 
-    for pagina in range(1, 11):
+    for pagina in range(1, 16):
 
         print(f"\n===== PÁGINA {pagina} =====")
 
@@ -77,6 +77,5 @@ with sync_playwright() as p:
 
     data = clean_data(dataFrame)
     process_data(data)
-    #dados.to_csv( "dados_imoveis.csv", index=False, encoding="utf-8-sig" )
 
     browser.close()
