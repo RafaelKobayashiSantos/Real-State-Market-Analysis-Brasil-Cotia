@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
+from config import EXCEL_NAME
 
 def process_data(data):
 
     df = pd.DataFrame(data)
 
-    # Corrigit tipagem dos dados
+    # Fixing the types of the columns
     df["preco"] = pd.to_numeric(df["preco"], errors="coerce")
     df["area"] = pd.to_numeric(df["area"], errors="coerce")
     df["quartos"] = pd.to_numeric(df["quartos"], errors="coerce")
@@ -15,14 +16,14 @@ def process_data(data):
     df["preco"] = df["preco"].fillna(0)
     df = df[df["preco"] <= 10000]
 
-    # Criação de nova coluna preço por metro quadrado
+    # Creating a new column for price per square meter
     df["preco_m2"] = np.where(
         df["area"] > 0,
         df["preco"] / df["area"],
         np.nan
     )
 
-    # Extração de bairro e cidade da descrição
+    # Extraction of neighborhood and city from the description
     df["bairro"] = (
         df["descricao"]
         .str.split(" em ")
@@ -37,6 +38,8 @@ def process_data(data):
         .str[-1]
         .str.strip()
     )
-    
 
-    df.to_excel( "dados_imoveis_pby.xlsx", index=False )
+    # Extract the type of property from the description
+    df['tipo de imóvel'] = df['descricao'].str.split(' ').str[0]
+
+    df.to_excel(f"data/{EXCEL_NAME}", index=False )

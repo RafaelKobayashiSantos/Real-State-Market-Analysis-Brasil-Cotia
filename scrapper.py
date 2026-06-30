@@ -1,3 +1,4 @@
+# Function to get the text content of an element within a card
 def get_text(card, selector):
 
     locator = card.locator(selector)
@@ -10,7 +11,7 @@ def get_text(card, selector):
 
     return "N/A"
 
-
+# Scrape the data from the cards and store it in a DataFrame
 def scrape_cards(cards, dataFrame):
 
     for i in range(cards.count()):

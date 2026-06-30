@@ -1,0 +1,141 @@
+table Sheet1
+	lineageTag: a34cd018-391b-49dd-ab9f-f2adcbacd432
+
+	measure 'Qtd Imoveis' =
+			
+			COUNT(Sheet1[descricao])
+		formatString: 0
+		lineageTag: 00c6836a-a119-4f8e-96ef-2fcbd1abf3a6
+
+	measure 'Avg Rm2' =
+			
+			AVERAGE(Sheet1[preco_m2])
+		lineageTag: ec359f4d-aa1a-42a0-9926-ff7ca8eec8f0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Rm2 Filtered' =
+			
+			IF(
+			    [Qtd Imoveis] >= 3,
+			    [Avg Rm2],
+			    BLANK()
+			)
+		lineageTag: 2f7a143d-7b5c-4296-8ee7-09b63aa22222
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column descricao
+		dataType: string
+		lineageTag: cfe21797-640a-4fde-8136-0ce41edc1bce
+		summarizeBy: none
+		sourceColumn: descricao
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco
+		dataType: int64
+		formatString: "R$"\ #,0;-"R$"\ #,0;"R$"\ #,0
+		lineageTag: fdfa4e7e-9558-4348-b322-6257046e4061
+		summarizeBy: sum
+		sourceColumn: preco
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	column area
+		dataType: int64
+		formatString: 0
+		lineageTag: 60ed5109-a743-410e-adc8-625e1142eeff
+		summarizeBy: sum
+		sourceColumn: area
+
+		annotation SummarizationSetBy = Automatic
+
+	column quartos
+		dataType: int64
+		formatString: 0
+		lineageTag: 5e2f09ef-6275-4d6c-a97e-4695e63b5a7d
+		summarizeBy: sum
+		sourceColumn: quartos
+
+		annotation SummarizationSetBy = Automatic
+
+	column banheiros
+		dataType: int64
+		formatString: 0
+		lineageTag: f485f440-c4b7-425d-b0ca-3494c4f7f2d0
+		summarizeBy: sum
+		sourceColumn: banheiros
+
+		annotation SummarizationSetBy = Automatic
+
+	column vagas
+		dataType: double
+		formatString: 0
+		lineageTag: e1c5432b-386e-43e1-8e8e-2cca72efe9bb
+		summarizeBy: sum
+		sourceColumn: vagas
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco_m2
+		dataType: double
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 9a58cd54-dd86-4775-89c8-db7b5503e827
+		summarizeBy: sum
+		sourceColumn: preco_m2
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	column bairro
+		dataType: string
+		lineageTag: ed4d161d-948d-4f58-b1dd-2a50dbd81974
+		summarizeBy: none
+		sourceColumn: bairro
+
+		annotation SummarizationSetBy = Automatic
+
+	column cidade
+		dataType: string
+		lineageTag: fac0f566-46ee-4a53-8788-4eed2055f9d3
+		summarizeBy: none
+		sourceColumn: cidade
+
+		annotation SummarizationSetBy = Automatic
+
+	column Local = CONCATENATE(Sheet1[bairro] & ", ",CONCATENATE( Sheet1[cidade] & " ","- São Paulo" ))
+		lineageTag: 9349e94c-2dd6-4d0f-8c8b-d270b60b440e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'tipo de imóvel'
+		dataType: string
+		lineageTag: e2706a88-4eb7-4764-8815-4d7b3c861465
+		summarizeBy: none
+		sourceColumn: tipo de imóvel
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sheet1 = m
+		mode: import
+		source =
+				let
+				  Origem = Excel.Workbook(File.Contents("C:\Users\Solange\OneDrive\Documents\Scrapping\dados_imoveis_pby.xlsx"), null, true),
+				  #"Navegação 1" = Origem{[Item = "Sheet1", Kind = "Sheet"]}[Data],
+				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
+				  #"Tipo de coluna alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {{"descricao", type text}, {"preco", Int64.Type}, {"area", Int64.Type}, {"quartos", Int64.Type}, {"banheiros", Int64.Type}, {"vagas", Int64.Type}, {"bairro", type text}, {"cidade", type text}}, "pt-BR"),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Tipo de coluna alterado",{{"preco_m2", type number}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Tipo Alterado",null,0,Replacer.ReplaceValue,{"vagas"}),
+				    #"Linhas Classificadas" = Table.Sort(#"Valor Substituído",{{"preco", Order.Descending}})
+				in
+				    #"Linhas Classificadas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

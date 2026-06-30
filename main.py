@@ -2,12 +2,13 @@ from playwright.sync_api import sync_playwright
 from scrapper import scrape_cards
 from pipeline import clean_data
 from data_engineering import process_data
+from config import *
 
 dataFrame = { "descricao": [], "preco": [], "area": [], "quartos": [], "banheiros": [], "vagas": [] }
 
 with sync_playwright() as p:
     browser = p.chromium.launch(
-        headless=False  # importante para visualizar o que acontece
+        headless=HEADLESS,
     )
 
     context = browser.new_context(
@@ -21,59 +22,44 @@ with sync_playwright() as p:
 
     page = context.new_page()
 
-    url = (
-        "https://www.zapimoveis.com.br/aluguel/casas/sp+cotia/?onde=%2CSão+Paulo%2CCotia%2C%2C%2C%2C%2Ccity%2CBR>Sao+Paulo>NULL>Cotia%2C-23.602694%2C-46.919476%2C&tipos=casa_residencial%2Capartamento_residencial&areaMaxima=100"
-    )
-
     page.goto(
-            url,
+            BASE_URL,
             wait_until="domcontentloaded",
             timeout=60000
         )
 
-    page.wait_for_timeout(5000)
+    page.wait_for_timeout(WAIT_LOAD)
 
-    for pagina in range(1, 16):
+    n_page = 1
 
-        print(f"\n===== PÁGINA {pagina} =====")
+    while n_page <= MAX_PAGES:
 
-        print("URL atual:")
-        print(page.url)
+        print(f"\n===== PÁGINA {n_page} =====")
 
-        print("\nTítulo:")
-        print(page.title())
+        cards = page.locator('[data-cy="rp-property-cd"]')
 
-        total = page.locator(
-            '[data-cy="rp-cardProperty-location-txt"]'
-        ).count()
+        if cards.count() == 0:
+            print("Nenhum anúncio encontrado.")
+            break
 
-        print("\nTotal de anúncios encontrados:")
-        print(total)
+        dataFrame = scrape_cards(cards, dataFrame)
 
-        if total > 0:
-            print("\nPrimeiro anúncio:")
-
-            texto = page.locator(
-                '[data-cy="rp-cardProperty-location-txt"]'
-            ).first.text_content()
-
-            print(texto)
-        
         page.mouse.wheel(0, 10000)
+        page.wait_for_timeout(WAIT_SCROLL)
 
-        page.wait_for_timeout(3000)
+        next = page.locator('[aria-label="próxima página"]')
 
-        cards = page.locator(
-        '[data-cy="rp-property-cd"]'
-        )
+        # Break the loop if there is no next page
+        if next.count() == 0:
+            break
+        
+        current_url = page.url
 
-        scrape_cards(cards, dataFrame)
+        next.click()
 
-        page.locator(
-            '[aria-label="próxima página"]'
-        ).click()
+        page.wait_for_url(lambda url: url != current_url)
 
-        page.wait_for_timeout(5000)
+        n_page += 1
 
     data = clean_data(dataFrame)
     process_data(data)

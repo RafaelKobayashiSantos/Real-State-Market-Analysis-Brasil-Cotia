@@ -1,5 +1,6 @@
 import pandas as pd
 
+# Function to clean and format the data in the DataFrame
 def clean_data(dataFrame):
 
     df = pd.DataFrame(dataFrame)
@@ -45,4 +46,3 @@ def clean_data(dataFrame):
 
     df.head() #Exibição dos primeiros registros para verificação
     return df
-
